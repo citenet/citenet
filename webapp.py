@@ -23,7 +23,7 @@ def get_papers():
         paper_id = "MED,23589462"
     crawler = Crawler()
     papers = crawler.crawl(paper_id, 10)
-    return_dict = {id : paper.as_dict() for id, paper in papers.items()}
+    return_dict = {id: paper.as_dict() for id, paper in papers.items()}
     return_list = [paper.as_dict() for id, paper in papers.items()]
     return jsonify(**{"list": return_list, "object": return_dict})
 
