@@ -9,11 +9,16 @@ class Crawler(object):
         self.iteration_counter = 0
 
     def crawl(self, initial_id, max_iters):
+        '''Start crawling
+
+        '''
+
         self.all[initial_id] = (search(initial_id))[0]
         self.crawl_rec(initial_id, max_iters)
         return self.all
 
     def crawl_rec(self, initial_id, max_iters):
+        '''i'''
         for reference in self.get_references(initial_id):
             self.append_child(reference)
             print initial_id, reference.api_id
