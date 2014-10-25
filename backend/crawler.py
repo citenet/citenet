@@ -1,5 +1,6 @@
 from backend.api import search
 
+
 class Crawler(object):
 
     def __init__(self):
@@ -23,8 +24,8 @@ class Crawler(object):
                 self.iteration_counter += 1
                 self.crawl_rec(target.api_id, max_iters)
 
-
     def get_references(self, api_id):
+
         return search(api_id, True)
 
     def append_child(self, child):
@@ -35,16 +36,22 @@ class Crawler(object):
             self.all[child.api_id].local_citation_count += 1
 
     def pick_next_targets(self):
-        if self.unwalked:
-            self.unwalked.sort(key=lambda paper: paper.local_citation_count, reverse=True)
-            if len(self.unwalked) > 3:
-                targets = self.unwalked[:3]
-            else:
-                targets = self.unwalked
-            for target in targets:
-                self.unwalked.remove(target)
-            return targets
-        else:
-            return []
 
+        targets = []
+
+        if self.unwalked:
+            self.unwalked.sort(key=lambda paper: paper.local_citation_count,
+                               reverse=True)
+
+            highest_citation_count = self.unwalked[0].local_citation_count
+
+            for paper in self.unwalked:
+
+                if paper.local_citation_count == highest_citation_count:
+                    targets.append(paper)
+
+        for target in targets:
+            self.unwalked.remove(target)
+
+        return targets
 
