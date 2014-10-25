@@ -39,6 +39,7 @@ class Crawler(object):
         for target in self.pick_next_targets():
             if self.iteration_counter < max_iters:
                 self.iteration_counter += 1
+                target.walked = True
                 self.crawl_rec(target.api_id, max_iters)
 
     def get_references(self, api_id):
@@ -72,14 +73,14 @@ class Crawler(object):
         targets = []
 
         if self.unwalked:
-            self.unwalked.sort(key=lambda paper: paper.local_citation_count,
+            self.unwalked.sort(key=lambda paper: paper.global_citation_count,
                                reverse=True)
 
-            highest_citation_count = self.unwalked[0].local_citation_count
+            highest_citation_count = self.unwalked[0].global_citation_count
 
             for paper in self.unwalked:
 
-                if paper.local_citation_count == highest_citation_count:
+                if paper.global_citation_count == highest_citation_count:
                     targets.append(paper)
                 else:
                     break

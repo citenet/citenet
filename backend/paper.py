@@ -17,6 +17,7 @@ class Paper(object):
         self.local_citation_count = 1
         self.global_citation_count = global_citation_count
         self.has_references = has_references
+        self.walked = False
         
         
     def as_dict(self):
