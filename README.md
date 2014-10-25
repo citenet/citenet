@@ -5,4 +5,4 @@ Setup
 -----
 
 1. Clone repo
-2. Install Flask `pip install Flask`
+2. Install Flask `pip install -r requirements.txt`
