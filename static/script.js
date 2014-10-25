@@ -5,7 +5,6 @@ $( document ).ready(function() {
 
     var action = $(this).attr("action");
     var documentId = $("[name=id]").val();
-    console.log('documentId', documentId);
 
     $.post(action, function(data) {
       $(".document-title").text(documentId);
@@ -15,15 +14,20 @@ $( document ).ready(function() {
 
 
   function visualizeStuff(json) {
-    // visualization
     var width = 1140;
-    var height = 1200;
-    var minRadius = 3;
-    var maxRadius = 7;
+    var height = width * 2;
+    var minRadius = 5;
+    var maxRadius = 10 * minRadius;
+
+    var publications = json.list;
 
     // helpers
     function stayInsideBoxWidth(x) { return Math.max((2 * maxRadius), Math.min(width - (2 * maxRadius), x)); }
     function stayInsideBoxHeight(y) { return Math.max((2 * maxRadius), Math.min(height - (2 * maxRadius), y)); }
+    function getYearFromDateString(dateString) {
+      var date = new Date(dateString);
+      return date.getFullYear();
+    }
 
     var color = d3.scale.category20();
 
@@ -37,20 +41,16 @@ $( document ).ready(function() {
                 .attr("width", width)
                 .attr("height", height);
 
-    // TODO: Get current Max and Min year
-    var earliestYear = 1971;
-    var latestYear = 2014;
+    var earliestYear = d3.min(publications, function(item) { return getYearFromDateString(item.date); });
+    var latestYear = d3.max(publications, function(item) { return getYearFromDateString(item.date); });
 
     var color = d3.scale.category20();
 
-    var publications = json.list;
-
-    // TODO: Get current Max and Min global_citation_count
-    var minCitationCount = 0;
-    var maxCitationCount = 100;
+    var minGlobalCitationCount = d3.min(publications, function(item) { return item.global_citation_count; });
+    var maxGlobalCitationCount = d3.max(publications, function(item) { return item.global_citation_count; });
 
     var scale = d3.scale.sqrt()
-                        .domain([minCitationCount, maxCitationCount])
+                        .domain([minGlobalCitationCount, maxGlobalCitationCount])
                         .range([minRadius, maxRadius]);
 
     // TODO: Figure out links and add them to force
@@ -61,11 +61,8 @@ $( document ).ready(function() {
                   .data(publications)
                   .enter().append("circle")
                   .attr("class", "node")
-                  .attr("r", function(d) { return scale(d.global_citation_count) })
-                  .style("fill", function(d) {
-                    var tempDate = new Date(d.date);
-                    return color(tempDate.getFullYear());
-                  })
+                  .attr("r", function(d) { return scale(d.global_citation_count); })
+                  .style("fill", function(d) { return color(getYearFromDateString(d.date)); })
                   .call(force.drag);
 
     node.append("title")
@@ -76,8 +73,7 @@ $( document ).ready(function() {
     force.on("tick", function() {
       node.attr("cx", function(d) { return d.x = stayInsideBoxWidth(d.x); })
           .attr("cy", function(d) {
-            var tempDate = new Date(d.date);
-            var yValue = y(tempDate.getFullYear());
+            var yValue = y(getYearFromDateString(d.date));
             return d.y = stayInsideBoxHeight(yValue);
           });
     });
