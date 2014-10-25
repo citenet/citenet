@@ -1,0 +1,6 @@
+digraph citations {
+splines=true;
+sep="+25,25";
+overlap=scalexy;
+node [fontsize=11];
+"23589462 FT" -> "19245337 TT"
