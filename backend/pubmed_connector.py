@@ -52,7 +52,7 @@ class PubMedConnector(APIConnector):
 
                 if len(result_json) > 0:
                     for result in result_json:
-                        if result.has_key('title'):
+                        if result.has_key('id') and result.has_key('title'):
                             references.append(self.create_cited_paper(result))
 
             papers[0].references = references
