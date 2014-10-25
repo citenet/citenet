@@ -45,15 +45,21 @@ class PubMedConnector(APIConnector):
             if get_references and paper_json['hasReferences'] == "Y":
                 collection = paper_json['source']
                 pubmed_id = paper_json['pmid']
-                res = self.call("%s/%s/references/1/json" % 
-                    (collection, pubmed_id))
+                reached_end = False
+                i = 1
+                while not reached_end:
+                    res = self.call("%s/%s/references/%i/json" % 
+                        (collection, pubmed_id, i))
 
-                result_json = json.loads(res.content)['referenceList']['reference']
+                    result_json = json.loads(res.content)['referenceList']['reference']
 
-                if len(result_json) > 0:
-                    for result in result_json:
-                        if result.has_key('id') and result.has_key('title'):
-                            references.append(self.create_cited_paper(result))
+                    if len(result_json) > 0:
+                        for result in result_json:
+                            if result.has_key('id') and result.has_key('title'):
+                                references.append(self.create_cited_paper(result))
+                    else:
+                        reached_end = True
+                    i += 1
 
             papers[0].references = references
         papers = papers + references
