@@ -10,5 +10,8 @@ class APIConnector(object):
         url = self.base_url + url
         return requests.get(url)
 
-    def search_doi(self, doi):
+    def search_doi(self, doi, get_references=False):
+        return []
+
+    def search_api_id(self, doi, get_references=False):
         return []

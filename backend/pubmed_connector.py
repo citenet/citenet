@@ -24,17 +24,17 @@ class PubMedConnector(APIConnector):
         result_json = json.loads(res.content)['resultList']['result'][0]
         return self.create_paper(result_json)
 
-    def search_doi(self, doi):
+    def search_doi(self, doi, get_references=False):
         res = self.call("search/query=%s&format=json" % doi)
-        return self.parse_result(res)
+        return self.parse_result(res, get_references)
 
-    def search_api_id(self, api_id):
+    def search_api_id(self, api_id, get_references=False):
         src, api_id = api_id.split(',')
         res = self.call("search/query=ext_id:%s src:%s&format=json" % 
             (api_id, src))
-        return self.parse_result(res)
+        return self.parse_result(res, get_references)
 
-    def parse_result(self, result):
+    def parse_result(self, result, get_references=False):
         result_json = json.loads(result.content)['resultList']['result']
         papers = []
         references = []
@@ -42,7 +42,7 @@ class PubMedConnector(APIConnector):
             paper_json = result_json[0]
             papers.append(self.create_paper(paper_json))
 
-            if paper_json['hasReferences'] == "Y":
+            if get_references and paper_json['hasReferences'] == "Y":
                 collection = paper_json['source']
                 pubmed_id = paper_json['pmid']
                 res = self.call("%s/%s/references/1/json" % 
