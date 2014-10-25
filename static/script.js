@@ -6,24 +6,39 @@ $( document ).ready(function() {
     var action = $(this).attr("action");
     var documentId = $("[name=id]").val();
 
+    var $title = $(".document-title");
+
+    var $spinner = $("<span />").addClass("glyphicon")
+                                .addClass("glyphicon-refresh")
+                                .addClass("glyphicon-refresh-animate");
+
+    var $wrappedSpinner = $("<h1 />").addClass("text-center")
+                                     .append($spinner);
+
+    $wrappedSpinner.insertAfter($title);
+
     $.post(action, function(data) {
-      $(".document-title").text(documentId);
+      $title.text(documentId);
+      $title.next("h1").remove();
+
+      var $existingSvg = $("#vis").find("svg");
+      if ($existingSvg.length > 0) { $existingSvg.remove(); }
+
       visualizeStuff(data);
     });
   });
-
 
   function visualizeStuff(json) {
     var width = 1140;
     var height = width * 2;
     var minRadius = 5;
-    var maxRadius = 10 * minRadius;
+    var maxRadius = 8 * minRadius;
 
     var publications = json.list;
 
     // helpers
-    function stayInsideBoxWidth(x) { return Math.max((2 * maxRadius), Math.min(width - (2 * maxRadius), x)); }
-    function stayInsideBoxHeight(y) { return Math.max((2 * maxRadius), Math.min(height - (2 * maxRadius), y)); }
+    function stayInsideBoxWidth(x) { return Math.max(maxRadius, Math.min(width - maxRadius, x)); }
+    function stayInsideBoxHeight(y) { return Math.max(maxRadius, Math.min(height - maxRadius, y)); }
     function getYearFromDateString(dateString) {
       var date = new Date(dateString);
       return date.getFullYear();
@@ -63,17 +78,16 @@ $( document ).ready(function() {
                   .attr("class", "node")
                   .attr("r", function(d) { return scale(d.global_citation_count); })
                   .style("fill", function(d) { return color(getYearFromDateString(d.date)); })
-                  .call(force.drag);
 
     node.append("title")
         .text(function(d) { return d.title + " | Citations: " + d.global_citation_count + " | date: " + d.date; });
 
-    var y = d3.time.scale().domain([latestYear, earliestYear]).range([0, height]);
+    var timeScale = d3.time.scale().domain([latestYear, earliestYear]).range([0, height]);
 
     force.on("tick", function() {
       node.attr("cx", function(d) { return d.x = stayInsideBoxWidth(d.x); })
           .attr("cy", function(d) {
-            var yValue = y(getYearFromDateString(d.date));
+            var yValue = timeScale(getYearFromDateString(d.date));
             return d.y = stayInsideBoxHeight(yValue);
           });
     });
