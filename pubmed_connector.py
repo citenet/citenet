@@ -8,16 +8,23 @@ from datamodel.datamodel import Paper
 class PubMedConnector(APIConnector):
 
     def __init__(self):
+        #super(PubMedConnector, self).__init__()
         self.api_id = 'pubmed'
 
     def create_paper(self, paper_json):
-        return Paper(paper_json['title'], 
-            paper_json['authorString'], 
-            paper_json['pubYear'], 
-            paper_json['doi'], 
+        return Paper(paper_json.setdefault('title', None), 
+            paper_json.setdefault('authorString', None),
+            paper_json.setdefault('pubYear', None),
+            paper_json.setdefault('doi', None), 
             self.api_id, "%s,%s" % (paper_json['source'], paper_json['pmid']),
             paper_json['isOpenAccess'] == "Y", 
             paper_json['citedByCount'])
+
+    def create_cited_paper(self, paper_json):
+        url = "http://www.ebi.ac.uk/europepmc/webservices/rest/search/query=ext_id:%s src:%s&format=json" % (paper_json['id'], paper_json['source'])
+        r = requests.get(url)
+        result_json = json.loads(r.content)['resultList']['result'][0]
+        return self.create_paper(result_json)
 
     def search_doi(self, doi):
         url = "https://www.ebi.ac.uk/europepmc/webservices/rest/search/query=%s%%20sort_cited:y&format=json" % doi
@@ -25,6 +32,7 @@ class PubMedConnector(APIConnector):
         r = requests.get(url)
         result_json = json.loads(r.content)['resultList']['result']
         papers = []
+        references = []
         if len(result_json) > 0:
             paper_json = result_json[0]
             papers.append(self.create_paper(paper_json)) 
@@ -41,13 +49,16 @@ class PubMedConnector(APIConnector):
 
                 if len(result_json) > 0:
                     #print len(result_json)
-                    reference_json = result_json[0]
+                    #reference_json = result_json[0]
                     #print(json.dumps(reference_json, sort_keys=True, 
                     #    indent=4, separators=(',', ': ')))
 
                     for result in result_json:
                         if result.has_key('title'):
                             #print result['title']
-                            papers.append(Paper(result['title'], result['authorString'], result['pubYear']))
+                            references.append(self.create_cited_paper(result))
+
+            papers[0].references = references
+        papers = papers + references
 
         return papers
