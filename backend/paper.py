@@ -3,7 +3,8 @@ from datetime import date
 class Paper(object):
 
     def __init__(self, title=None, authors=None, date=None, doi=None,
-                 references=None, api=None, api_id=None, isOpenAccess=False, global_citation_count=0):
+                 references=None, api=None, api_id=None, isOpenAccess=False, 
+                 global_citation_count=0, has_references=False):
 
         self.title = title
         self.authors = authors or []
@@ -15,6 +16,7 @@ class Paper(object):
         self.isOpenAccess = isOpenAccess
         self.local_citation_count = 1
         self.global_citation_count = global_citation_count
+        self.has_references = has_references
         
         
     def as_dict(self):

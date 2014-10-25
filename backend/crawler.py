@@ -55,7 +55,8 @@ class Crawler(object):
         '''
 
         if not child.api_id in self.all:
-            self.unwalked.append(child)
+            if child.has_references:
+                self.unwalked.append(child)
             self.all[child.api_id] = child
         else:
             self.all[child.api_id].local_citation_count += 1

@@ -34,7 +34,8 @@ class PubMedConnector(APIConnector):
             doi=paper_json.setdefault('doi', None),
             api_id="%s,%s" % (paper_json['source'], paper_json['pmid']),
             isOpenAccess=paper_json['isOpenAccess'] == "Y",
-            global_citation_count=paper_json['citedByCount'])
+            global_citation_count=paper_json['citedByCount'],
+            has_references=(paper_json['hasReferences'] == "Y"))
 
     def create_cited_paper(self, paper_json):
         res = self.call("search/query=ext_id:%s src:%s&format=json" % 
