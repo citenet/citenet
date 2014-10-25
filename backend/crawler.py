@@ -46,7 +46,14 @@ class Crawler(object):
         '''Get all references for an id, for now the pubmed id.
         '''
 
-        return search(api_id, True)
+        references = search(api_id, True)
+        with_refs = [ref for ref in references if ref.has_references]
+        without_refs = [ref for ref in references if not ref.has_references]
+        without_refs.sort(key=lambda paper: paper.global_citation_count,
+                               reverse=True)
+        #print len(references), int(len(references)*0.5)
+        return with_refs + without_refs[:10]
+
 
     def append_child(self, child):
         '''Updates the papers in the unwalked list and all dict. Also
@@ -73,7 +80,9 @@ class Crawler(object):
         targets = []
 
         if self.unwalked:
-            self.unwalked.sort(key=lambda paper: paper.global_citation_count,
+            global_max = (max(self.unwalked, key=lambda paper: paper.global_citation_count)).global_citation_count
+            print global_max
+            self.unwalked.sort(key=lambda paper: paper.global_citation_count/global_max + paper.local_citation_count,
                                reverse=True)
 
             highest_citation_count = self.unwalked[0].global_citation_count
