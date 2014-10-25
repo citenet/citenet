@@ -11,10 +11,6 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
-@app.route("/search")
-def search():
-    return render_template("search.html")
-
 @app.route("/papers", methods = ['GET', 'POST'])
 def get_papers():
     if request.form:
