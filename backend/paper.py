@@ -1,6 +1,9 @@
-from datetime import date
 
 class Paper(object):
+    '''Paper object. Stores all kind of properties corresponding to
+       one paper.
+
+    '''
 
     def __init__(self, title=None, authors=None, date=None, doi=None,
                  references=None, api=None, api_id=None, isOpenAccess=False,
@@ -20,20 +23,23 @@ class Paper(object):
         self.walked = False
         self.depth = None
 
-
     def as_dict(self):
-        dictionary = {
-        "title": self.title,
-        "authors": self.authors,
-        "date": self.date,
-        "doi": self.doi,
-        "references": self.references,
-        "api": self.api,
-        "api_id": self.api_id,
-        "isOpenAccess": self.isOpenAccess,
-        "local_citation_count": self.local_citation_count,
-        "global_citation_count": self.global_citation_count,
-        }
+        '''Returns relavant attributes in a dict. Can be used later on
+           to create JSON.
+
+        '''
+        dictionary = {"title": self.title,
+                      "authors": self.authors,
+                      "date": self.date,
+                      "doi": self.doi,
+                      "references": self.references,
+                      "api": self.api,
+                      "api_id": self.api_id,
+                      "isOpenAccess": self.isOpenAccess,
+                      "local_citation_count": self.local_citation_count,
+                      "global_citation_count": self.global_citation_count
+                      }
+
         return dictionary
 
 

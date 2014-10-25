@@ -2,14 +2,20 @@ from backend.api import search
 
 
 class Crawler(object):
+    '''Crawler class. most important method is crawl.
+
+    '''
 
     def __init__(self):
+        '''Init'''
+
         self.unwalked = []
         self.all = {}
         self.iteration_counter = 0
 
     def crawl(self, initial_id, max_iters):
         '''Start crawling.
+               args:
                initial_id: pubmed id of the paper where the crawling
                            starts.
                 max_iters: maximum number of iteration, these bascically
@@ -29,7 +35,8 @@ class Crawler(object):
 
     def crawl_rec(self, initial_id, max_iters):
         '''Recrive crawling.
-               initial_id: pubmed id of the paper where the crawling
+                args:
+                initial_id: pubmed id of the paper where the crawling
                            starts.
                 max_iters: maximum number of iteration, these bascically
                            correspond to the number of API calls. not
@@ -60,7 +67,7 @@ class Crawler(object):
     def append_child(self, child):
         '''Updates the papers in the unwalked list and all dict. Also
            updates the local_citation_count.
-               child: new paper object.
+               args: child: new paper object.
 
         '''
 
@@ -101,20 +108,32 @@ class Crawler(object):
 
         return targets
 
-    def post_filter(self):
+    def post_filter(self, cutoff=0.25):
+        '''Is called after the actual crawling process is done. Removes
+           some nodes that possibly visually cluther the network. For
+           these nodes there is no reference information and they are
+           also not cited by more than one other paper. Also they don't
+           belong to the most globally cited papers in this
+           list.
+               args: cutoff: the fraction of papers that should be
+                             kept in the network. These are the papers
+                             with the highest global citation count.
+                             default: 0.25
 
-        print len(self.all.values())
+        '''
+
         if self.all:
 
-            all_papers = sorted(self.all.values(), key=lambda paper: paper.global_citation_count, reverse=True)
+            all_papers = sorted(self.all.values(),
+                                key=lambda paper: paper.global_citation_count,
+                                reverse=True)
 
-            less_globally_cited = all_papers[int(len(all_papers)*0.25):]
+            less_globally_cited = all_papers[int(len(all_papers)*cutoff):]
 
             for paper in less_globally_cited:
 
                 if not paper.references and paper.local_citation_count == 1 and not paper.depth == 0:
 
                     self.all.pop(paper.api_id)
-        print len(self.all.values())
 
 
