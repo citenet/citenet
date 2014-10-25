@@ -3,7 +3,7 @@ import requests
 class APIConnector(object):
 
     def __init__(self):
-        self.api_id = ''
+        self.api_name = ''
         self.base_url = ''
 
     def call(self, url):

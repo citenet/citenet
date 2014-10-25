@@ -1,22 +1,22 @@
 import json
 
 from api_connector import APIConnector
-from datamodel import Paper
+from paper import Paper
 
 class PubMedConnector(APIConnector):
 
     def __init__(self):
-        self.api_id = 'pubmed'
+        self.api_name = 'pubmed'
         self.base_url = "http://www.ebi.ac.uk/europepmc/webservices/rest/"
 
     def create_paper(self, paper_json):
-        return Paper(paper_json.setdefault('title', None), 
-            paper_json.setdefault('authorString', None),
-            paper_json.setdefault('pubYear', None),
-            paper_json.setdefault('doi', None), 
-            self.api_id, "%s,%s" % (paper_json['source'], paper_json['pmid']),
-            paper_json['isOpenAccess'] == "Y", 
-            paper_json['citedByCount'])
+        return Paper(title=paper_json.setdefault('title', None),
+            authors=paper_json.setdefault('authorString', None),
+            date=paper_json.setdefault('pubYear', None),
+            doi=paper_json.setdefault('doi', None),
+            api_id= "%s,%s" % (paper_json['source'], paper_json['pmid']),
+            isOpenAccess=paper_json['isOpenAccess'] == "Y",
+            global_citation_count=paper_json['citedByCount'])
 
     def create_cited_paper(self, paper_json):
         r = self.call("search/query=ext_id:%s src:%s&format=json" % (paper_json['id'], paper_json['source']))
