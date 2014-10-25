@@ -1,13 +1,13 @@
 import json
 
-from backend.api_connector import APIConnector
-import requests
-from datamodel.datamodel import Paper
+from api_connector import APIConnector
+from datamodel import Paper
 
 class PubMedConnector(APIConnector):
 
     def __init__(self):
         self.api_id = 'pubmed'
+        self.base_url = "http://www.ebi.ac.uk/europepmc/webservices/rest/"
 
     def create_paper(self, paper_json):
         return Paper(paper_json.setdefault('title', None), 
@@ -19,14 +19,12 @@ class PubMedConnector(APIConnector):
             paper_json['citedByCount'])
 
     def create_cited_paper(self, paper_json):
-        url = "http://www.ebi.ac.uk/europepmc/webservices/rest/search/query=ext_id:%s src:%s&format=json" % (paper_json['id'], paper_json['source'])
-        r = requests.get(url)
+        r = self.call("search/query=ext_id:%s src:%s&format=json" % (paper_json['id'], paper_json['source']))
         result_json = json.loads(r.content)['resultList']['result'][0]
         return self.create_paper(result_json)
 
     def search_doi(self, doi):
-        url = "https://www.ebi.ac.uk/europepmc/webservices/rest/search/query=%s%%20sort_cited:y&format=json" % doi
-        r = requests.get(url)
+        r = self.call("search/query=%s%%20sort_cited:y&format=json" % doi)
         result_json = json.loads(r.content)['resultList']['result']
         papers = []
         references = []
@@ -37,9 +35,8 @@ class PubMedConnector(APIConnector):
             if paper_json['hasReferences'] == "Y":
                 collection = paper_json['source']
                 pubmed_id = paper_json['pmid']
-                url = "https://www.ebi.ac.uk/europepmc/webservices/rest/%s/%s/references/1/json" % (collection, pubmed_id)
+                r = self.call("%s/%s/references/1/json" % (collection, pubmed_id))
 
-                r = requests.get(url)
                 result_json = json.loads(r.content)['referenceList']['reference']
 
                 if len(result_json) > 0:

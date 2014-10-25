@@ -1,6 +1,6 @@
 import sys
 
-from backend.pubmed_connector import PubMedConnector
+from pubmed_connector import PubMedConnector
 
 def search(doi):
     pubmed = PubMedConnector()
