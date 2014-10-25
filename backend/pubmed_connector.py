@@ -1,4 +1,4 @@
-import json
+import json, requests, datetime
 
 from api_connector import APIConnector
 from paper import Paper
@@ -10,11 +10,24 @@ class PubMedConnector(APIConnector):
         self.base_url = "http://www.ebi.ac.uk/europepmc/webservices/rest/"
 
     def create_paper(self, paper_json):
+        if paper_json.has_key('doi'):
+            res = requests.get("http://api.crossref.org/works/%s" % paper_json['doi'])
+            date = json.loads(res.content)['message']['issued']['date-parts'][0]
+            while len(date) < 3:
+                date.append(1)
+            year, month, day = date
+            date = datetime.date(year, month, day)
+        else:
+            if paper_json.has_key('pubYear'):
+                date = datetime.date(int(paper_json['pubYear']), 1, 1)
+            else:
+                date = None
+
         return Paper(
             api=self.api_name,
             title=paper_json.setdefault('title', None),
             authors=paper_json.setdefault('authorString', None),
-            date=paper_json.setdefault('pubYear', None),
+            date=date,
             doi=paper_json.setdefault('doi', None),
             api_id="%s,%s" % (paper_json['source'], paper_json['pmid']),
             isOpenAccess=paper_json['isOpenAccess'] == "Y",
