@@ -13,10 +13,10 @@ def index():
 @app.route("/papers")
 def get_papers():
     crawler = Crawler()
-    papers = crawler.crawl("MED,12634793", 40)
+    papers = crawler.crawl("MED,23589462", 10)
     returnDict = {id : paper.as_dict() for id, paper in papers.items()}
-    print(returnDict)
-    return jsonify(**returnDict)
+    returnList = [paper.as_dict() for id, paper in papers.items()]
+    return jsonify(**{"list": returnList, "object":     returnDict})
 
 if __name__ == "__main__":
     app.run(debug=True)

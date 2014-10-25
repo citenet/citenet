@@ -23,8 +23,6 @@ class Crawler(object):
                 self.iteration_counter += 1
                 self.crawl_rec(target.api_id, max_iters)
 
-    def get_most_connected(self):
-        return self.unwalked
 
     def get_references(self, api_id):
         return search(api_id, True)
@@ -37,9 +35,12 @@ class Crawler(object):
             self.all[child.api_id].local_citation_count += 1
 
     def pick_next_targets(self):
-        if(self.unwalked):
+        if self.unwalked:
             self.unwalked.sort(key=lambda paper: paper.local_citation_count, reverse=True)
-            targets = [self.unwalked[0]]
+            if len(self.unwalked) > 3:
+                targets = self.unwalked[:3]
+            else:
+                targets = self.unwalked
             for target in targets:
                 self.unwalked.remove(target)
             return targets
