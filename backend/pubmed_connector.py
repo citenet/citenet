@@ -1,8 +1,7 @@
-from api_connector import APIConnector
-
-import requests
 import json
 
+from backend.api_connector import APIConnector
+import requests
 from datamodel.datamodel import Paper
 
 class PubMedConnector(APIConnector):
