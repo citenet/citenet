@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import render_template
+from flask import request
 from flask import jsonify
 import pprint
 from backend.crawler import Crawler
@@ -10,10 +11,18 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
-@app.route("/papers")
+@app.route("/search")
+def search():
+    return render_template("search.html")
+
+@app.route("/papers", methods = ['GET', 'POST'])
 def get_papers():
+    if request.form:
+        paper_id = request.form['id']
+    else:
+        paper_id = "MED,23589462"
     crawler = Crawler()
-    papers = crawler.crawl("MED,23589462", 10)
+    papers = crawler.crawl(paper_id, 10)
     return_dict = {id : paper.as_dict() for id, paper in papers.items()}
     return_list = [paper.as_dict() for id, paper in papers.items()]
     return jsonify(**{"list": return_list, "object": return_dict})
