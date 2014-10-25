@@ -7,19 +7,23 @@ body {
   stroke-width: 1.5px;
 }
 
+
+.spinner {
+  color: #999;
+}
+
 .glyphicon-refresh-animate {
-    font-size: 36px;
-    -animation: spin 1s infinite linear;
-    -webkit-animation: spinwebkit 1s infinite linear;
-    color: #999;
+  font-size: 36px;
+  -animation: spin 1s infinite linear;
+  -webkit-animation: spinwebkit 1s infinite linear;
 }
 
 @-webkit-keyframes spinwebkit {
-    from { -webkit-transform: rotate(0deg); }
-    to { -webkit-transform: rotate(360deg); }
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(360deg); }
 }
 
 @keyframes spin {
-    from { transform: scale(1) rotate(0deg); }
-    to { transform: scale(1) rotate(360deg); }
+  from { transform: scale(1) rotate(0deg); }
+  to { transform: scale(1) rotate(360deg); }
 }
