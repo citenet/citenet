@@ -16,7 +16,7 @@ def get_papers():
     papers = crawler.crawl("MED,23589462", 10)
     returnDict = {id : paper.as_dict() for id, paper in papers.items()}
     returnList = [paper.as_dict() for id, paper in papers.items()]
-    return jsonify(**{"list": returnList, "object":     returnDict})
+    return jsonify(**{"list": returnList, "object": returnDict})
 
 if __name__ == "__main__":
     app.run(debug=True)
