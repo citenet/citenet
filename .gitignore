@@ -86,3 +86,6 @@ target/
 
 # KDE directory preferences
 .directory
+
+### IntelliJ project setup
+.idea
