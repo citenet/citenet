@@ -1,0 +1,54 @@
+from urllib2 import Request, urlopen, URLError
+import json
+
+papers = {}
+unwalked_papers = set()
+
+
+def walk_papers(papers):
+
+    for paper in most_connected(unwalked_papers):
+
+        for reference in paper.get_references():
+
+            childPaper = findPaperByID(reference.ID)
+
+            if not childPaper:
+                childPaper = Paper(reference)
+                papers[reference.ID] = childPaper
+                unwalked_papers[reference.ID] = childPaper
+
+            childPaper.citations.add(paper)
+
+        unwalked_papers.remove(paper)
+
+
+class Paper(object):
+    """docstring for Paper"""
+    def __init__(self, doi=None, title=None, authors=None,
+                 abstract=None, time=None, citations=None):
+        super(Paper, self).__init__()
+        self.doi = doi
+        self.title = title
+        self.time = time
+        self.citations = set()
+
+    def get_references(self):
+
+        get_references_for_doi(self.doi)
+
+
+def get_references_for_id(source, id):
+
+    url_template = 'http://www.ebi.ac.uk/europepmc/webservices/rest/{source}/{id}/references/1/json'
+    url = url_template.format(source=source, id=id)
+    request = Request(url)
+
+    try:
+        response = urlopen(request)
+        print response.read(
+)
+    except URLError, e:
+        pass
+
+
