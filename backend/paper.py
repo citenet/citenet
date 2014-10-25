@@ -6,15 +6,31 @@ class Paper(object):
                  references=None, api=None, api_id=None, isOpenAccess=False, global_citation_count=0):
 
         self.title = title
-        self.authors = authors or set()
+        self.authors = authors or []
         self.date = date
         self.doi = doi
-        self.references = references or set()
+        self.references = references or []
         self.api = api
         self.api_id = api_id
         self.isOpenAccess = isOpenAccess
         self.local_citation_count = 1
         self.global_citation_count = global_citation_count
+        
+        
+    def as_dict(self):
+        dictionary = {
+        "title": self.title,
+        "authors": self.authors,
+        "date": self.date,
+        "doi": self.doi,
+        "references": self.references,
+        "api": self.api,
+        "api_id": self.api_id,
+        "isOpenAccess": self.isOpenAccess,
+        "local_citation_count": self.local_citation_count,
+        "global_citation_count": self.global_citation_count,
+        }
+        return dictionary
 
 
 

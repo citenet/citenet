@@ -2,9 +2,9 @@ import sys
 
 from pubmed_connector import PubMedConnector
 
-def search(doi):
+def search(doi, get_references=False):
     pubmed = PubMedConnector()
-    return pubmed.search_api_id(doi)
+    return pubmed.search_api_id(doi, get_references)
 
 if __name__ == '__main__':
     papers = search(sys.argv[1])

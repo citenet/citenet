@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template
 from flask import jsonify
+import pprint
 from backend.crawler import Crawler
 
 app = Flask(__name__)
@@ -12,9 +13,10 @@ def index():
 @app.route("/papers")
 def get_papers():
     crawler = Crawler()
-    papers = crawler.crawl("10.1038/nature01511", 5)
-    print papers
-    return jsonify(**papers)
+    papers = crawler.crawl("MED,12634793", 40)
+    returnDict = {id : paper.as_dict() for id, paper in papers.items()}
+    print(returnDict)
+    return jsonify(**returnDict)
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -10,7 +10,9 @@ class PubMedConnector(APIConnector):
         self.base_url = "http://www.ebi.ac.uk/europepmc/webservices/rest/"
 
     def create_paper(self, paper_json):
-        return Paper(title=paper_json.setdefault('title', None),
+        return Paper(
+            api=self.api_name,
+            title=paper_json.setdefault('title', None),
             authors=paper_json.setdefault('authorString', None),
             date=paper_json.setdefault('pubYear', None),
             doi=paper_json.setdefault('doi', None),
@@ -40,7 +42,8 @@ class PubMedConnector(APIConnector):
         references = []
         if len(result_json) > 0:
             paper_json = result_json[0]
-            papers.append(self.create_paper(paper_json))
+            if not get_references:
+                papers.append(self.create_paper(paper_json))
 
             if get_references and paper_json['hasReferences'] == "Y":
                 collection = paper_json['source']
@@ -61,6 +64,7 @@ class PubMedConnector(APIConnector):
                         reached_end = True
                     i += 1
 
-            papers[0].references = references
+            if not get_references:
+                papers[0].references = references
         papers = papers + references
         return papers
