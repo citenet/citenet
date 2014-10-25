@@ -18,7 +18,10 @@ class Crawler(object):
 
         '''
 
-        self.all[initial_id] = (search(initial_id))[0]
+        start_paper = (search(initial_id))[0]
+        start_paper.depth = 0
+        self.all[initial_id] = start_paper
+
         self.crawl_rec(initial_id, max_iters)
         return self.all
 
@@ -32,9 +35,13 @@ class Crawler(object):
 
         '''
 
+        initial_paper = self.all[initial_id]
+        child_depth = initial_paper.depth + 1
+
         for reference in self.get_references(initial_id):
+            reference.depth = child_depth
             self.append_child(reference)
-            self.all[initial_id].references.append(reference.api_id)
+            initial_paper.references.append(reference.api_id)
 
         for target in self.pick_next_targets():
             if self.iteration_counter < max_iters:
@@ -84,6 +91,8 @@ class Crawler(object):
                     targets.append(paper)
                 else:
                     break
+
+            targets.sort(key=lambda paper: paper.depth)
 
         for target in targets:
             self.unwalked.remove(target)
