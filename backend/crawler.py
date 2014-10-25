@@ -21,7 +21,6 @@ class Crawler(object):
         '''i'''
         for reference in self.get_references(initial_id):
             self.append_child(reference)
-            print initial_id, reference.api_id
             self.all[initial_id].references.append(reference.api_id)
 
         for target in self.pick_next_targets():

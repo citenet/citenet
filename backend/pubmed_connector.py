@@ -5,21 +5,24 @@ from paper import Paper
 
 class PubMedConnector(APIConnector):
 
-    def __init__(self):
+    def __init__(self, get_date=True):
         self.api_name = 'pubmed'
         self.base_url = "http://www.ebi.ac.uk/europepmc/webservices/rest/"
+        self.get_date = get_date
 
     def create_paper(self, paper_json):
-        if paper_json.has_key('doi'):
+        date = None
+        if self.get_date and paper_json.has_key('doi'):
             res = requests.get("http://api.crossref.org/works/%s" % paper_json['doi'])
-            date = json.loads(res.content)['message']['issued']['date-parts'][0]
-            while len(date) < 3:
-                date.append(1)
-            year, month, day = date
-            date = datetime.date(year, month, day)
-        else:
+            if res.status_code == 200:
+                date = json.loads(res.content)['message']['issued']['date-parts'][0]
+                while len(date) < 3:
+                    date.append(1)
+                year, month, day = date
+                date = str(datetime.date(year, month, day))
+        if date == None:
             if paper_json.has_key('pubYear'):
-                date = datetime.date(int(paper_json['pubYear']), 1, 1)
+                date = str(datetime.date(int(paper_json['pubYear']), 1, 1))
             else:
                 date = None
 
