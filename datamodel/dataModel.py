@@ -4,7 +4,7 @@ class Paper(object):
 
     def __init__(self, title=None, authors=None, date=None, doi=None,
                  references=None, api=None, api_id=None, openAccess=False,
-                 incoming_citation_count=1):
+                 incoming_citation_count=0):
 
         self.title = title
         self.authors = authors or set()
