@@ -23,6 +23,8 @@ class Crawler(object):
         self.all[initial_id] = start_paper
 
         self.crawl_rec(initial_id, max_iters)
+        self.post_filter()
+
         return self.all
 
     def crawl_rec(self, initial_id, max_iters):
@@ -80,14 +82,14 @@ class Crawler(object):
         targets = []
 
         if self.unwalked:
-            self.unwalked.sort(key=lambda paper: paper.global_citation_count,
+            self.unwalked.sort(key=lambda paper: paper.local_citation_count,
                                reverse=True)
 
-            highest_citation_count = self.unwalked[0].global_citation_count
+            highest_citation_count = self.unwalked[0].local_citation_count
 
             for paper in self.unwalked:
 
-                if paper.global_citation_count == highest_citation_count:
+                if paper.local_citation_count == highest_citation_count:
                     targets.append(paper)
                 else:
                     break
@@ -98,4 +100,21 @@ class Crawler(object):
             self.unwalked.remove(target)
 
         return targets
+
+    def post_filter(self):
+
+        print len(self.all.values())
+        if self.all:
+
+            all_papers = sorted(self.all.values(), key=lambda paper: paper.global_citation_count, reverse=True)
+
+            less_globally_cited = all_papers[int(len(all_papers)*0.25):]
+
+            for paper in less_globally_cited:
+
+                if not paper.references and paper.local_citation_count == 1 and not paper.depth == 0:
+
+                    self.all.pop(paper.api_id)
+        print len(self.all.values())
+
 
