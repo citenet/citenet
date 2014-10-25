@@ -14,18 +14,28 @@ class PubMedConnector(APIConnector):
             authors=paper_json.setdefault('authorString', None),
             date=paper_json.setdefault('pubYear', None),
             doi=paper_json.setdefault('doi', None),
-            api_id= "%s,%s" % (paper_json['source'], paper_json['pmid']),
+            api_id="%s,%s" % (paper_json['source'], paper_json['pmid']),
             isOpenAccess=paper_json['isOpenAccess'] == "Y",
             global_citation_count=paper_json['citedByCount'])
 
     def create_cited_paper(self, paper_json):
-        r = self.call("search/query=ext_id:%s src:%s&format=json" % (paper_json['id'], paper_json['source']))
-        result_json = json.loads(r.content)['resultList']['result'][0]
+        res = self.call("search/query=ext_id:%s src:%s&format=json" % 
+            (paper_json['id'], paper_json['source']))
+        result_json = json.loads(res.content)['resultList']['result'][0]
         return self.create_paper(result_json)
 
     def search_doi(self, doi):
-        r = self.call("search/query=%s%%20sort_cited:y&format=json" % doi)
-        result_json = json.loads(r.content)['resultList']['result']
+        res = self.call("search/query=%s&format=json" % doi)
+        return self.parse_result(res)
+
+    def search_api_id(self, api_id):
+        src, api_id = api_id.split(',')
+        res = self.call("search/query=ext_id:%s src:%s&format=json" % 
+            (api_id, src))
+        return self.parse_result(res)
+
+    def parse_result(self, result):
+        result_json = json.loads(result.content)['resultList']['result']
         papers = []
         references = []
         if len(result_json) > 0:
@@ -35,17 +45,16 @@ class PubMedConnector(APIConnector):
             if paper_json['hasReferences'] == "Y":
                 collection = paper_json['source']
                 pubmed_id = paper_json['pmid']
-                r = self.call("%s/%s/references/1/json" % (collection, pubmed_id))
+                res = self.call("%s/%s/references/1/json" % 
+                    (collection, pubmed_id))
 
-                result_json = json.loads(r.content)['referenceList']['reference']
+                result_json = json.loads(res.content)['referenceList']['reference']
 
                 if len(result_json) > 0:
-
                     for result in result_json:
                         if result.has_key('title'):
                             references.append(self.create_cited_paper(result))
 
             papers[0].references = references
         papers = papers + references
-
         return papers

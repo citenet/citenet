@@ -4,7 +4,7 @@ from pubmed_connector import PubMedConnector
 
 def search(doi):
     pubmed = PubMedConnector()
-    return pubmed.search_doi(doi)
+    return pubmed.search_api_id(doi)
 
 if __name__ == '__main__':
     papers = search(sys.argv[1])
