@@ -68,6 +68,7 @@ class Crawler(object):
                 if self.iteration_counter > max_iters:
                     return
                 self.iteration_counter += 1
+                print self.iteration_counter
 
                 for reference in self.get_references(paper.api_id):
                     reference.depth = paper.depth + 1
@@ -168,16 +169,29 @@ class Crawler(object):
 
         if self.all:
 
-            all_papers = sorted(self.all.values(),
-                                key=lambda paper: paper.global_citation_count,
-                                reverse=True)
+            all_papers = self.all.values()
 
-            less_globally_cited = all_papers[int(len(all_papers)*cutoff):]
+            if len(all_papers) > 300:
 
-            for paper in less_globally_cited:
+                print 'more than 300'
 
-                if not paper.references and paper.local_citation_count == 1 and not paper.depth == 0:
+                all_papers.sort(key=lambda paper: (paper.local_citation_count, paper.global_citation_count), reverse=True)
 
+                for paper in all_papers[300:]:
                     self.all.pop(paper.api_id)
+                print len(self.all.values())
+
+            elif len(all_papers) > 100:
+
+                print 'more than 100'
+
+                less_connected_papers = [paper for paper in all_papers if not paper.references and paper.local_citation_count==1 and not paper.depth <= 1]
+
+                less_connected_papers.sort(key=lambda paper: (paper.global_citation_count))
+
+                for paper in less_connected_papers[int(len(less_connected_papers)*cutoff):]:
+                    self.all.pop(paper.api_id)
+
+
 
 
