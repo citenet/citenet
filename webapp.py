@@ -5,6 +5,8 @@ from flask import jsonify
 import pprint
 from backend.crawler import Crawler
 
+import time
+
 app = Flask(__name__)
 
 @app.route("/")
@@ -13,6 +15,8 @@ def index():
 
 @app.route("/papers", methods = ['GET', 'POST'])
 def get_papers():
+    start = time.time()
+    
     if request.form:
         paper_id = request.form['id']
     else:
@@ -21,6 +25,9 @@ def get_papers():
     papers = crawler.crawl(paper_id, 10)
     return_dict = {id: paper.as_dict() for id, paper in papers.items()}
     return_list = [paper.as_dict() for id, paper in papers.items()]
+
+    end = time.time()
+    print end - start
 
     return jsonify(**{"list": return_list, "object": return_dict})
 
