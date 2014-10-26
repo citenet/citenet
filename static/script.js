@@ -181,12 +181,15 @@ $( document ).ready(function() {
     // add nodes to svg
     var node = svg.selectAll(".node")
                   .data(publications)
-                  .enter().append("circle")
-                  .attr("class", "node")
-                  .attr("r", function(d) { return scaleRadius(d.global_citation_count); })
-                  .style("fill", function(d) { return color(getYearFromDateString(d.date)); })
-                  .on("mouseover", tip.show)
-                  .on("mouseout", tip.hide);
+                  .enter().append("svg:a")
+                    .attr("xlink:href", function(d){return d.url;})
+                    .append("circle")
+                      .attr("class", "node")
+                      .attr("r", function(d) { return scaleRadius(d.global_citation_count); })
+                      .attr("id", function(d){return d.global_citation_count;})
+                      .style("fill", function(d) { return color(getYearFromDateString(d.date)); })
+                      .on("mouseover", tip.show)
+                      .on("mouseout", tip.hide);
 
     // TODO: Remove
     // add title to nodes

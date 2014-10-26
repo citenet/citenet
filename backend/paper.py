@@ -29,6 +29,11 @@ class Paper(object):
            to create JSON.
 
         '''
+
+        if self.doi:
+            url = 'http://dx.doi.org/' + self.doi
+        else:
+            url = None
         dictionary = {"title": self.title,
                       "authors": self.authors,
                       "date": self.date,
@@ -39,7 +44,8 @@ class Paper(object):
                       "isOpenAccess": self.isOpenAccess,
                       "local_citation_count": self.local_citation_count,
                       "global_citation_count": self.global_citation_count,
-                      "crawled_in_iteration" : self.crawled_in_iteration
+                      "crawled_in_iteration" : self.crawled_in_iteration,
+                      "url" : url
                       }
 
         return dictionary
