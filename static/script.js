@@ -127,7 +127,7 @@ $( document ).ready(function() {
                 .attr('class', 'd3-tip')
                 .offset([-10, 0])
                 .html(function(d) {
-                  return "<strong>" + d.title + "</strong><br/>By: " + d.authors + "<br/>Published: " + d.date;
+                  return "<strong>" + d.title + "</strong><br/>By: " + d.authors + "<br/>Published: " + d.date + "<br/><strong>Number of global citations: " + d.global_citation_count + "</strong><br/>Number of local citations: " + d.local_citation_count;
                 });
 
     // add nodes to layout
