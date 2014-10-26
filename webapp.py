@@ -5,6 +5,8 @@ from flask import jsonify
 import pprint
 from backend.crawler import Crawler
 
+import os # to get env variables for heroku
+
 import time
 
 app = Flask(__name__, static_url_path='')
@@ -31,5 +33,7 @@ def get_papers():
 
     return jsonify(**{"list": return_list, "object": return_dict})
 
+port = int(os.environ.get('PORT', 5000)) # use port variable or 5000
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=port)
