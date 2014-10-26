@@ -22,24 +22,22 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="/">CiteNet</a>
+        <a class="navbar-brand" href="/">Cite<span class="blue">Net</span></a>
       </div>
       <div class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-          <li class="active"><a href="/">Home</a></li>
-          <li><a href="#about">About</a></li> <!-- TODO: Add link -->
-          <li><a href="#contact">Contact</a></li> <!-- TODO: Add link -->
+          <li><a href="#json" class="cached-json">Load Cached Example</a></li>
         </ul>
 
         <div class="col-sm-3 col-md-3">
-            <form class="navbar-form" role="search" action="papers" method="post" id="document-search-form">
-            <div class="input-group">
-                <input type="text" class="form-control" placeholder="Document ID" name="id">
-                <div class="input-group-btn">
-                  <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
-                </div>
-            </div>
-            </form>
+          <form class="navbar-form" role="search" action="papers" method="post" id="document-search-form">
+          <div class="input-group">
+              <input type="text" class="form-control" placeholder="Document ID" name="id">
+              <div class="input-group-btn">
+                <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+              </div>
+          </div>
+          </form>
         </div>
       </div><!--/.nav-collapse -->
     </div>
@@ -52,6 +50,7 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> <!-- TODO: Add locally so demo works without internet connection -->
   <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script> <!-- TODO: Add locally so demo works without internet connection -->
   <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.13/d3.min.js"></script> <!-- TODO: Add locally so demo works without internet connection -->
+  <script src="//cdnjs.cloudflare.com/ajax/libs/d3-tip/0.6.3/d3-tip.min.js"></script> <!-- TODO: Add locally so demo works without internet connection -->
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
