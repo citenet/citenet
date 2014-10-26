@@ -13,31 +13,32 @@ class PubMedConnector(APIConnector):
         self.references = []
 
     def create_paper(self, paper_json):
-        date = None
-        if self.get_date and paper_json.has_key('doi'):
-            res = requests.get("http://api.crossref.org/works/%s" % paper_json['doi'])
-            if res.status_code == 200:
-                date = json.loads(res.content)['message']['issued']['date-parts'][0]
-                while len(date) < 3:
-                    date.append(1)
-                year, month, day = date
-                date = str(datetime.date(year, month, day))
-        if date == None:
-            if paper_json.has_key('pubYear'):
-                date = str(datetime.date(int(paper_json['pubYear']), 1, 1))
-            else:
-                date = None
+        if paper_json.has_key('pmid'):
+            date = None
+            if self.get_date and paper_json.has_key('doi'):
+                res = requests.get("http://api.crossref.org/works/%s" % paper_json['doi'])
+                if res.status_code == 200:
+                    date = json.loads(res.content)['message']['issued']['date-parts'][0]
+                    while len(date) < 3:
+                        date.append(1)
+                    year, month, day = date
+                    date = str(datetime.date(year, month, day))
+            if date == None:
+                if paper_json.has_key('pubYear'):
+                    date = str(datetime.date(int(paper_json['pubYear']), 1, 1))
+                else:
+                    date = None
 
-        return Paper(
-            api=self.api_name,
-            title=paper_json.setdefault('title', None),
-            authors=paper_json.setdefault('authorString', None),
-            date=date,
-            doi=paper_json.setdefault('doi', None),
-            api_id="%s,%s" % (paper_json['source'], paper_json['pmid']),
-            isOpenAccess=paper_json['isOpenAccess'] == "Y",
-            global_citation_count=paper_json['citedByCount'],
-            has_references=(paper_json['hasReferences'] == "Y"))
+            return Paper(
+                api=self.api_name,
+                title=paper_json.setdefault('title', None),
+                authors=paper_json.setdefault('authorString', None),
+                date=date,
+                doi=paper_json.setdefault('doi', None),
+                api_id="%s,%s" % (paper_json['source'], paper_json['pmid']),
+                isOpenAccess=paper_json['isOpenAccess'] == "Y",
+                global_citation_count=paper_json['citedByCount'],
+                has_references=(paper_json['hasReferences'] == "Y"))
 
     def create_cited_paper(self, paper_json):
         res = self.call("search/query=ext_id:%s src:%s&format=json" % 
@@ -61,7 +62,9 @@ class PubMedConnector(APIConnector):
         if len(result_json) > 0:
             for result in result_json:
                 if result.has_key('id') and result.has_key('title'):
-                    self.references.append(self.create_cited_paper(result))
+                    reference = self.create_cited_paper(result)
+                    if reference:
+                        self.references.append(reference)
 
     def parse_result(self, result, get_references=False):
         result_json = json.loads(result.content)['resultList']['result']
