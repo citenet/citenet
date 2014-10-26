@@ -1,4 +1,5 @@
-import json, requests, datetime
+import json, requests, datetime, math
+from requests_futures.sessions import FuturesSession
 
 from api_connector import APIConnector
 from paper import Paper
@@ -9,6 +10,7 @@ class PubMedConnector(APIConnector):
         self.api_name = 'pubmed'
         self.base_url = "http://www.ebi.ac.uk/europepmc/webservices/rest/"
         self.get_date = get_date
+        self.references = []
 
     def create_paper(self, paper_json):
         date = None
@@ -53,10 +55,18 @@ class PubMedConnector(APIConnector):
             (api_id, src))
         return self.parse_result(res, get_references)
 
+    def process_references_page(self, res):
+        result_json = res.json()['referenceList']['reference']
+
+        if len(result_json) > 0:
+            for result in result_json:
+                if result.has_key('id') and result.has_key('title'):
+                    self.references.append(self.create_cited_paper(result))
+
     def parse_result(self, result, get_references=False):
         result_json = json.loads(result.content)['resultList']['result']
         papers = []
-        references = []
+        self.references = []
         if len(result_json) > 0:
             paper_json = result_json[0]
             if not get_references:
@@ -65,23 +75,22 @@ class PubMedConnector(APIConnector):
             if get_references and paper_json['hasReferences'] == "Y":
                 collection = paper_json['source']
                 pubmed_id = paper_json['pmid']
-                reached_end = False
-                i = 1
-                while not reached_end:
-                    res = self.call("%s/%s/references/%i/json" % 
-                        (collection, pubmed_id, i))
 
-                    result_json = json.loads(res.content)['referenceList']['reference']
+                res = self.call("%s/%s/references/%i/json" % 
+                        (collection, pubmed_id, 1))
 
-                    if len(result_json) > 0:
-                        for result in result_json:
-                            if result.has_key('id') and result.has_key('title'):
-                                references.append(self.create_cited_paper(result))
-                    else:
-                        reached_end = True
-                    i += 1
+                result_json = res.json()
+                hits = result_json['hitCount']
+                result_json = result_json['referenceList']['reference']
+                self.process_references_page(res)
+
+                session = FuturesSession(max_workers=5)
+                for i in range(2, int(math.ceil(hits / 25.0) + 1)):
+                    self.call_async("%s/%s/references/%i/json" % 
+                        (collection, pubmed_id, i), session, 
+                        self.process_references_page)
 
             if not get_references:
-                papers[0].references = references
-        papers = papers + references
+                papers[0].references = self.references
+        papers = papers + self.references
         return papers

@@ -6,9 +6,16 @@ class APIConnector(object):
         self.api_name = ''
         self.base_url = ''
 
-    def call(self, url):
+    def call(self, url, head=False):
         url = self.base_url + url
-        return requests.get(url)
+        if head:
+            return requests.head(url)
+        else:
+            return requests.get(url)
+
+    def call_async(self, url, session, callback):
+        url = self.base_url + url
+        session.get(url, background_callback=callback)
 
     def search_doi(self, doi, get_references=False):
         return []

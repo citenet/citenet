@@ -27,7 +27,7 @@ def get_papers():
     return_list = [paper.as_dict() for id, paper in papers.items()]
 
     end = time.time()
-    print end - start
+    print end - start, len(return_list)
 
     return jsonify(**{"list": return_list, "object": return_dict})
 
