@@ -51,9 +51,7 @@ $( document ).ready(function() {
 
     var publications = json.list;
 
-    // helpers
-    function stayInsideBoxWidth(x) { return Math.max(maxRadius, Math.min(width - maxRadius, x)); }
-    function stayInsideBoxHeight(y) { return Math.max(maxRadius, Math.min(height - maxRadius, y)); }
+    // helper to get only year
     function getYearFromDateString(dateString) {
       var date = new Date(dateString);
       return date.getFullYear();
@@ -104,15 +102,12 @@ $( document ).ready(function() {
         .text(function(d) { return d.title + " | Citations: " + d.global_citation_count + " | date: " + d.date; });
 
     // scale foo
-    var timeScale = d3.time.scale().domain([maxYear, minYear]).range([0, height]);
+    var timeScale = d3.time.scale().domain([maxYear, minYear]).range([maxRadius, height - maxRadius]);
 
     // handle positioning of circles on svg
     force.on("tick", function() {
-      node.attr("cx", function(d) { return d.x = stayInsideBoxWidth(d.x); })
-          .attr("cy", function(d) {
-            var yValue = timeScale(getYearFromDateString(d.date));
-            return d.y = stayInsideBoxHeight(yValue);
-          });
+      node.attr("cx", function(d) { return d.x; })
+          .attr("cy", function(d) { return d.y = timeScale(getYearFromDateString(d.date)); });
     });
 
   }
