@@ -57,7 +57,11 @@ class Crawler(object):
             self.append_child(paper)
 
         # Walk
+
         while True:
+
+            if not self.unwalked:
+                return
 
             for paper in self.pick_next_targets():
 
@@ -113,6 +117,7 @@ class Crawler(object):
         if not child.api_id in self.all:
             if child.has_references:
                 self.unwalked.append(child)
+            child.crawled_in_iteration = self.iteration_counter
             self.all[child.api_id] = child
         else:
             self.all[child.api_id].local_citation_count += 1

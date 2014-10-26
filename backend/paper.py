@@ -22,6 +22,7 @@ class Paper(object):
         self.has_references = has_references
         self.walked = False
         self.depth = None
+        self.crawled_in_iteration = 0
 
     def as_dict(self):
         '''Returns relavant attributes in a dict. Can be used later on
@@ -37,7 +38,8 @@ class Paper(object):
                       "api_id": self.api_id,
                       "isOpenAccess": self.isOpenAccess,
                       "local_citation_count": self.local_citation_count,
-                      "global_citation_count": self.global_citation_count
+                      "global_citation_count": self.global_citation_count,
+                      "crawled_in_iteration" : self.crawled_in_iteration
                       }
 
         return dictionary
