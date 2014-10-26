@@ -1,19 +1,23 @@
 $( document ).ready(function() {
 
   // cached json helper for dev
-  $('.cached-json').click(function(event) {
+  $(".cached-json").click(function(event) {
     event.preventDefault();
 
     var action = $(this).attr("action");
     var documentId = $("[name=id]").val();
 
     var $title = $(".document-title");
+    var $logo = $("#logo");
 
-    // remove existing visualization
+    // remove existing visualization and show logo
     var $existingSvg = $("#vis").find("svg");
-    if ($existingSvg.length > 0) { $existingSvg.remove(); }
+    if ($existingSvg.length > 0) {
+      $existingSvg.remove();
+      $logo.show();
+    }
 
-    $.getJSON('/cached-papers.json', function(json) {
+    $.getJSON("/cached-papers.json", function(json) {
       // set new title
       var title = json.object["MED,19245337"].title;
       $title.empty()
@@ -22,29 +26,35 @@ $( document ).ready(function() {
             .text(title);
 
       // create and add subtitle to title
-      var $subtitle = $('<small />').text(" [" + "MED,19245337" + "]")
+      var $subtitle = $("<small />").text(" [MED,19245337]")
                                     .appendTo($title);
 
       // remove spinner
       $title.next("h1").remove();
 
+      // hide logo
+      $logo.hide();
       // new visualization
       visualizeStuff(json); // TODO: update existing instead of remove + add
     });
   });
 
   // searchform submit button handler
-  $('#document-search-form').submit(function(event) {
+  $("#document-search-form").submit(function(event) {
     event.preventDefault();
 
     var action = $(this).attr("action");
     var documentId = $("[name=id]").val();
 
     var $title = $(".document-title");
+    var $logo = $("#logo");
 
     // remove existing visualization
     var $existingSvg = $("#vis").find("svg");
-    if ($existingSvg.length > 0) { $existingSvg.remove(); }
+    if ($existingSvg.length > 0) {
+      $existingSvg.remove();
+      $logo.show();
+    }
 
     // create and add spinner
     var $spinner = $("<span />").addClass("glyphicon")
@@ -66,12 +76,14 @@ $( document ).ready(function() {
             .text(title);
 
       // create and add subtitle to title
-      var $subtitle = $('<small />').text(" [" + documentId + "]")
+      var $subtitle = $("<small />").text(" [" + documentId + "]")
                                     .appendTo($title);
 
       // remove spinner
       $title.next("h1").remove();
 
+      // hide logo
+      $logo.hide();
       // new visualization
       visualizeStuff(json); // TODO: update existing instead of remove + add
     });
@@ -124,10 +136,10 @@ $( document ).ready(function() {
 
     // initialize d3-tip
     var tip = d3.tip()
-                .attr('class', 'd3-tip')
+                .attr("class", "d3-tip")
                 .offset([-10, 0])
                 .html(function(d) {
-                  return "<strong>" + d.title + "</strong><br/>By: " + d.authors + "<br/>Published: " + d.date;
+                  return "<strong>" + d.title + "</strong><br/>By: " + d.authors + "<br/>Published: " + d.date + "<br/><br/><strong>Number of global citations: " + d.global_citation_count + "</strong><br/>Number of local citations: " + d.local_citation_count;
                 });
 
     // add nodes to layout
@@ -163,8 +175,8 @@ $( document ).ready(function() {
                   .attr("class", "node")
                   .attr("r", function(d) { return scaleRadius(d.global_citation_count); })
                   .style("fill", function(d) { return color(getYearFromDateString(d.date)); })
-                  .on('mouseover', tip.show)
-                  .on('mouseout', tip.hide);
+                  .on("mouseover", tip.show)
+                  .on("mouseout", tip.hide);
 
     // TODO: Remove
     // add title to nodes
