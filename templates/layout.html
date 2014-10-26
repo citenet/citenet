@@ -7,7 +7,7 @@
   <title>CiteNet</title>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width">
-  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"> <!-- TODO: Add locally so demo works without internet connection -->
+  <link rel="stylesheet" href="/vendor/bootstrap.min.css">
   <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -47,10 +47,10 @@
     {% block body %}{% endblock %} <!-- Content get's added here -->
   </section>
 
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script> <!-- TODO: Add locally so demo works without internet connection -->
-  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script> <!-- TODO: Add locally so demo works without internet connection -->
-  <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.13/d3.min.js"></script> <!-- TODO: Add locally so demo works without internet connection -->
-  <script src="//cdnjs.cloudflare.com/ajax/libs/d3-tip/0.6.3/d3-tip.min.js"></script> <!-- TODO: Add locally so demo works without internet connection -->
+  <script src="/vendor/jquery.min.js"></script>
+  <script src="/vendor/bootstrap.min.js"></script>
+  <script src="/vendor/d3.min.js"></script>
+  <script src="/vendor/d3-tip.min.js"></script>
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
