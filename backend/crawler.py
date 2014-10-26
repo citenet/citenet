@@ -28,13 +28,52 @@ class Crawler(object):
         start_paper.depth = 0
         self.all[initial_id] = start_paper
 
-        self.crawl_rec(initial_id, max_iters)
+        #self.crawl_rec(initial_id, max_iters)
+        self.crawl_linear(initial_id, max_iters)
         self.post_filter()
 
         return self.all
 
+    def crawl_linear(self,initial_id, max_iters):
+        '''Non-recursive crawler. Takes the papers with the highest
+           citation scores in the local network and finds the references
+           for them. The order of crawling is different than in the
+           recursive version. More (filtered) breadth first.
+                args:
+                initial_id: pubmed id of the paper where the crawling
+                           starts.
+                max_iters: maximum number of iteration, these bascically
+                           correspond to the number of API calls. not
+                           to be confused with 'generations'.
+
+        '''
+
+        # Setting up the first paper in the model as a starting point.
+        start_paper = self.all[initial_id]
+        references_of_first_paper = self.get_references(initial_id)
+        for paper in references_of_first_paper:
+            start_paper.references.append(paper.api_id)
+            paper.depth = 1
+            self.append_child(paper)
+
+        # Walk
+        while True:
+
+            for paper in self.pick_next_targets():
+
+                if self.iteration_counter > max_iters:
+                    return
+                self.iteration_counter += 1
+
+                for reference in self.get_references(paper.api_id):
+                    reference.depth = paper.depth + 1
+                    self.append_child(reference)
+                    paper.references.append(reference.api_id)
+
+
+
     def crawl_rec(self, initial_id, max_iters):
-        '''Recrive crawling.
+        '''Recursive crawling.
                 args:
                 initial_id: pubmed id of the paper where the crawling
                            starts.
