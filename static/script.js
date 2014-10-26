@@ -139,7 +139,17 @@ $( document ).ready(function() {
                 .attr("class", "d3-tip")
                 .offset([-10, 0])
                 .html(function(d) {
-                  return "<strong>" + d.title + "</strong><br/>By: " + d.authors + "<br/>Published: " + d.date + "<br/><br/><strong>Number of global citations: " + d.global_citation_count + "</strong><br/>Number of local citations: " + d.local_citation_count;
+                  var htmlString = "<strong>" + d.title + "</strong>";
+                  htmlString += "<br/>By: " + d.authors;
+                  htmlString += "<br/>Published: " + d.date;
+                  htmlString += "<br/><br/><strong>Number of global citations: " + d.global_citation_count + "</strong>";
+                  htmlString += "<br/>Number of local citations: " + d.local_citation_count;
+                  if (d.isOpenAccess) {
+                    htmlString += "<br/><br/><strong class=\"green\">Open Access</strong>"
+                  } else {
+                    htmlString += "<br/><br/><strong class=\"red\">NOT Open Access</strong>"
+                  }
+                  return htmlString;
                 });
 
     // add nodes to layout
