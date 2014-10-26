@@ -18,7 +18,7 @@ def index():
 @app.route("/papers", methods = ['GET', 'POST'])
 def get_papers():
     start = time.time()
-    
+
     if request.form:
         paper_id = request.form['id']
     else:
@@ -33,7 +33,6 @@ def get_papers():
 
     return jsonify(**{"list": return_list, "object": return_dict})
 
-port = int(os.environ.get('PORT', 5000)) # use port variable or 5000
-
 if __name__ == "__main__":
-    app.run(debug=True, port=port)
+    port = int(os.environ.get('PORT', 5000)) # use port variable or 5000
+    app.run(debug=False, port=port)
