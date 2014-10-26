@@ -36,6 +36,14 @@ body {
   color: rgb(54, 171, 223);
 }
 
+.red {
+  color: firebrick;
+}
+
+.green {
+  color: forestgreen ;
+}
+
 .d3-tip {
   line-height: 1;
   font-size: 10px;
