@@ -57,7 +57,7 @@ $( document ).ready(function() {
           .append($spinner);
 
     // make ajax post and handle received data
-    $.post(action, function(json) {
+    $.post(action, {"id": documentId}).done(function(json) {
       // set new title
       var title = json.object[documentId].title;
       $title.empty()
