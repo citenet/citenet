@@ -33,7 +33,7 @@ body {
 }
 
 .blue {
-  color: #3619e0;
+  color: rgb(54, 171, 223);
 }
 
 .d3-tip {
@@ -47,7 +47,7 @@ body {
 }
 
 .d3-tip strong {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 /* Creates a small triangle extender for the tooltip */
