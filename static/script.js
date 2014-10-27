@@ -1,60 +1,10 @@
 $( document ).ready(function() {
+  // get DOM elements that don't change
+  var $title = $(".document-title");
+  var $logo = $("#logo");
 
-  // cached json helper for dev
-  $(".cached-json").click(function(event) {
-    event.preventDefault();
-
-    var action = $(this).attr("action");
-    var documentId = $("[name=id]").val();
-
-    var $title = $(".document-title");
-    var $logo = $("#logo");
-
-    // remove existing visualization and show logo
+  function enableLoadingState() {
     var $existingSvg = $("#vis").find("svg");
-    if ($existingSvg.length > 0) {
-      $existingSvg.remove();
-      $logo.show();
-    }
-
-    $.getJSON("/cached-papers.json", function(json) {
-      // set new title
-      var title = json.object["MED,19245337"].title;
-      $title.empty()
-            .removeClass("spinner")
-            .removeClass("text-center")
-            .text(title);
-
-      // create and add subtitle to title
-      var $subtitle = $("<small />").text(" [MED,19245337]")
-                                    .appendTo($title);
-
-      // remove spinner
-      $title.next("h1").remove();
-
-      // hide logo
-      $logo.hide();
-      // new visualization
-      visualizeStuff(json); // TODO: update existing instead of remove + add
-    });
-  });
-
-  // searchform submit button handler
-  $("#document-search-form").submit(function(event) {
-    event.preventDefault();
-
-    var action = $(this).attr("action");
-    var documentId = $("[name=id]").val();
-
-    var $title = $(".document-title");
-    var $logo = $("#logo");
-
-    // remove existing visualization
-    var $existingSvg = $("#vis").find("svg");
-    if ($existingSvg.length > 0) {
-      $existingSvg.remove();
-      $logo.show();
-    }
 
     // create and add spinner
     var $spinner = $("<span />").addClass("glyphicon")
@@ -66,24 +16,60 @@ $( document ).ready(function() {
           .addClass("text-center")
           .append($spinner);
 
+    if ($existingSvg.length > 0) {
+      $existingSvg.remove();
+      $logo.show();
+    }
+  }
+
+  function disableLoadingState(newTitle, documentId) {
+    $title.empty()
+          .removeClass("spinner")
+          .removeClass("text-center")
+          .text(newTitle);
+
+    // create and add subtitle to title
+    var $subtitle = $("<small />").text(" [" + documentId + "]")
+                                  .appendTo($title);
+
+    // remove spinner
+    $title.next("h1").remove();
+
+    // hide logo
+    $logo.hide();
+  }
+
+  // cached json helper for dev
+  $(".cached-json").click(function(event) {
+    event.preventDefault();
+
+    enableLoadingState();
+
+    $.getJSON("/cached-papers.json", function(json) {
+      var title = json.object["MED,19245337"].title;
+
+      disableLoadingState(title, "MED,19245337");
+
+      // new visualization
+      visualizeStuff(json); // TODO: update existing instead of remove + add
+    });
+  });
+
+  // searchform submit button handler
+  $("#document-search-form").submit(function(event) {
+    event.preventDefault();
+
+    enableLoadingState();
+
+    var action = $(this).attr("action");
+    var documentId = $("[name=id]").val();
+
     // make ajax post and handle received data
     $.post(action, {"id": documentId}).done(function(json) {
-      // set new title
       var title = json.object[documentId].title;
-      $title.empty()
-            .removeClass("spinner")
-            .removeClass("text-center")
-            .text(title);
 
-      // create and add subtitle to title
-      var $subtitle = $("<small />").text(" [" + documentId + "]")
-                                    .appendTo($title);
+      disableLoadingState(title, documentId);
 
-      // remove spinner
-      $title.next("h1").remove();
-
-      // hide logo
-      $logo.hide();
       // new visualization
       visualizeStuff(json); // TODO: update existing instead of remove + add
     });
@@ -117,13 +103,10 @@ $( document ).ready(function() {
                   .linkDistance(200)
                   .size([width, height]);
 
-    // TODO: Figure out links and add them to force
     var publicationsWithReferences = publications.filter(function(item) { return item.references.length > 0; });
     var links = [];
     publicationsWithReferences.forEach(function(item) {
-      // TODO: Generate links
       item.references.forEach(function(reference) {
-        // reference == "MED,19245337"
         var sourceNode = publications.filter(function(source) { return source.api_id === item.api_id })[0];
         var targetNode = publications.filter(function(target) { return target.api_id === reference })[0];
 
@@ -187,11 +170,6 @@ $( document ).ready(function() {
                   .style("fill", function(d) { return color(getYearFromDateString(d.date)); })
                   .on("mouseover", tip.show)
                   .on("mouseout", tip.hide);
-
-    // TODO: Remove
-    // add title to nodes
-    // node.append("title")
-    //     .text(function(d) { return d.title + " | Citations: " + d.global_citation_count + " | date: " + d.date; });
 
     // scale foo
     var timeScale = d3.time.scale().domain([maxYear, minYear]).range([maxRadius, height - maxRadius]);
