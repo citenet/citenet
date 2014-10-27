@@ -77,3 +77,9 @@ body {
   top: 100%;
   left: 0;
 }
+
+/* Add space between logo and about section */
+#about {
+  margin-top: 20px;
+}
+
