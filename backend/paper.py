@@ -1,4 +1,6 @@
 
+from backend.api import search
+
 class Paper(object):
     '''Paper object. Stores all kind of properties corresponding to
        one paper.
@@ -39,11 +41,24 @@ class Paper(object):
                       "isOpenAccess": self.isOpenAccess,
                       "local_citation_count": self.local_citation_count,
                       "global_citation_count": self.global_citation_count,
-                      "crawled_in_iteration" : self.crawled_in_iteration
+                      "crawled_in_iteration": self.crawled_in_iteration
                       }
 
         return dictionary
 
+    def increment_citation_count(self):
+        self.local_citation_count += 1
+
+    @property
+    def key_tuple(self):
+        return (self.api, self.api_id)
+
+    def get_references(self):
+        '''Get the reference list for this paper.
+
+        '''
+
+        return search(self.api, self.api_id, True)
 
 
 
