@@ -22,7 +22,7 @@ class Tree(object):
         self.papers[paper.key_tuple] = paper
         self.unwalked.append(paper)
 
-    def register_citation(self, cited_paper, citing_paper=None):
+    def register_citation(self, citing_paper=None, cited_paper=None):
 
         if cited_paper:
             duplicate = self.find_duplicate_paper(cited_paper)
@@ -30,6 +30,8 @@ class Tree(object):
                 duplicate.increment_citation_count()
             else:
                 self.add_new_paper(cited_paper)
+            if citing_paper:
+                citing_paper.append(duplicate or cited_paper)
 
     def remove_from_unwalked(self, paper):
 

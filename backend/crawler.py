@@ -1,4 +1,5 @@
-from backend.api import search
+from backend.api import get_references_for_paper, search
+from backend.tree import Tree
 
 
 class Crawler(object):
@@ -9,8 +10,7 @@ class Crawler(object):
     def __init__(self):
         '''Init'''
 
-        self.unwalked = []
-        self.all = {}
+        self.tree = Tree()
         self.iteration_counter = 0
 
     def crawl(self, initial_id, max_iters):
@@ -25,16 +25,41 @@ class Crawler(object):
         '''
 
         start_paper = (search(initial_id))[0]
+        self.tree.add_new_paper(start_paper)
         start_paper.depth = 0
         self.all[initial_id] = start_paper
+        references = get_references_for_paper(start_paper)
+        start_paper.references = references
+        for reference in references:
+            self.tree.register_citation(citing_paper=start_paper,
+                                        cited_paper=reference)
+            reference.depth = start_paper.depth + 1
 
-        #self.crawl_rec(initial_id, max_iters)
+        self.tree.remove_from_unwalked(start_paper)
         self.crawl_linear(initial_id, max_iters)
         self.post_filter()
 
         return self.all
 
-    def crawl_linear(self,initial_id, max_iters):
+    def crawl_linear(self, start_paper, max_iters):
+
+        while self.tree.unwalked:
+
+            for paper in self.pick_next_targets():
+
+                if self.iteration_counter > max_iters:
+                    return
+                self.iteration_counter += 1
+                print self.iteration_counter
+
+                for reference in self.get_references_for_paper(paper):
+                    reference.depth = paper.depth + 1
+                    self.tree.register_citation(citing_paper=start_paper,
+                                                cited_paper=reference)
+                    paper.references.append(reference)
+                self.tree.unwalked.remove_from_unwalked(paper)
+
+    def crawl_linear_old(self, initial_id, max_iters):
         '''Non-recursive crawler. Takes the papers with the highest
            citation scores in the local network and finds the references
            for them. The order of crawling is different than in the
@@ -75,8 +100,6 @@ class Crawler(object):
                     self.append_child(reference)
                     paper.references.append(reference.api_id)
 
-
-
     def crawl_rec(self, initial_id, max_iters):
         '''Recursive crawling.
                 args:
@@ -105,8 +128,8 @@ class Crawler(object):
     def get_references(self, api_id):
         '''Get all references for an id, for now the pubmed id.
         '''
-
-        return search(api_id, True)
+        pass
+        #return search(api_id, True)
 
     def append_child(self, child):
         '''Updates the papers in the unwalked list and all dict. Also
@@ -133,23 +156,18 @@ class Crawler(object):
 
         targets = []
 
-        if self.unwalked:
-            self.unwalked.sort(key=lambda paper: paper.local_citation_count,
-                               reverse=True)
+        if self.tree.unwalked:
+            self.tree.unwalked.sort(key=lambda paper: paper.local_citation_count,
+                                    reverse=True)
+            highest_citation_count = self.tree.unwalked[0].local_citation_count
 
-            highest_citation_count = self.unwalked[0].local_citation_count
-
-            for paper in self.unwalked:
-
+            for paper in self.tree.unwalked:
                 if paper.local_citation_count == highest_citation_count:
                     targets.append(paper)
                 else:
                     break
 
             targets.sort(key=lambda paper: paper.depth)
-
-        for target in targets:
-            self.unwalked.remove(target)
 
         return targets
 
@@ -167,30 +185,27 @@ class Crawler(object):
 
         '''
 
-        if self.all:
+        if self.tree.papers:
 
-            all_papers = self.all.values()
+            all_papers = self.tree.papers.values()
 
             if len(all_papers) > 300:
 
-                print 'more than 300'
-
-                all_papers.sort(key=lambda paper: (paper.local_citation_count, paper.global_citation_count), reverse=True)
+                all_papers.sort(key=lambda paper: (paper.local_citation_count,
+                                paper.global_citation_count), reverse=True)
 
                 for paper in all_papers[300:]:
-                    self.all.pop(paper.api_id)
+                    self.tree.papers.pop(paper.key_tuple)
                 print len(self.all.values())
 
             elif len(all_papers) > 100:
-
-                print 'more than 100'
 
                 less_connected_papers = [paper for paper in all_papers if not paper.references and paper.local_citation_count==1 and not paper.depth <= 1]
 
                 less_connected_papers.sort(key=lambda paper: (paper.global_citation_count))
 
                 for paper in less_connected_papers[int(len(less_connected_papers)*cutoff):]:
-                    self.all.pop(paper.api_id)
+                                                   self.tree.papers.pop(paper.key_tuple)
 
 
 

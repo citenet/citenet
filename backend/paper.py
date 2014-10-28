@@ -1,5 +1,4 @@
 
-from backend.api import search
 
 class Paper(object):
     '''Paper object. Stores all kind of properties corresponding to
@@ -35,7 +34,7 @@ class Paper(object):
                       "authors": self.authors,
                       "date": self.date,
                       "doi": self.doi,
-                      "references": self.references,
+                      "references": [reference.api_id for reference in self.references],
                       "api": self.api,
                       "api_id": self.api_id,
                       "isOpenAccess": self.isOpenAccess,
@@ -53,14 +52,6 @@ class Paper(object):
     def key_tuple(self):
         return (self.api, self.api_id)
 
-    def fetch_references(self):
-        '''Get the reference list for this paper.
-
-        '''
-
-        self.references = search(self.api, self.api_id, True)
-        for reference in self.references:
-            reference.depth = self.depth + 1
 
 
 
