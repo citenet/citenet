@@ -53,12 +53,15 @@ class Paper(object):
     def key_tuple(self):
         return (self.api, self.api_id)
 
-    def get_references(self):
+    def fetch_references(self):
         '''Get the reference list for this paper.
 
         '''
 
-        return search(self.api, self.api_id, True)
+        self.references = search(self.api, self.api_id, True)
+        for reference in self.references:
+            reference.depth = self.depth + 1
+
 
 
 

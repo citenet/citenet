@@ -31,10 +31,7 @@ class Tree(object):
             else:
                 self.add_new_paper(cited_paper)
 
+    def remove_from_unwalked(self, paper):
 
-
-
-
-
-
+        self.unwalked.remove(paper)
 
