@@ -5,7 +5,8 @@ Werkzeug==0.9.6
 argparse==1.2.1
 futures==2.2.0
 itsdangerous==0.24
+redis==2.7.1
+redis-simple-cache==0.0.6
 requests==2.4.3
 requests-futures==0.9.5
 wsgiref==0.1.2
-gunicorn
