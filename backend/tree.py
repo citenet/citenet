@@ -4,10 +4,15 @@ class Tree(object):
     """Tree that is crawled by the crawler"""
     def __init__(self, papers=None):
         super(Tree, self).__init__()
-        self.start_papers = papers[:]
-        self.unwalked = papers
-        self.papers = {(paper.api_name,
-                        paper.api_id): paper for paper in papers}
+        if papers:
+            self.start_papers = papers[:]
+            self.unwalked = papers
+            self.papers = {(paper.api_name,
+                            paper.api_id): paper for paper in papers}
+        else:
+            self.start_papers = []
+            self.unwalked = []
+            self.papers = {}
 
     def paper_is_present(self, paper):
 
@@ -31,9 +36,12 @@ class Tree(object):
             else:
                 self.add_new_paper(cited_paper)
             if citing_paper:
-                citing_paper.append(duplicate or cited_paper)
+                citing_paper.references.append(duplicate or cited_paper)
 
     def remove_from_unwalked(self, paper):
 
         self.unwalked.remove(paper)
+
+    def as_dict(self):
+
 

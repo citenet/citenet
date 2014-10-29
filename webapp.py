@@ -23,11 +23,13 @@ def get_papers():
         paper_id = request.form['id']
     else:
         paper_id = "MED,23589462"
+
     crawler = Crawler()
-    papers = crawler.crawl(paper_id, 10)
+    papers = crawler.crawl(paper_id, 2)
+
     return_dict = {id: paper.as_dict() for id, paper in papers.items()}
     return_list = [paper.as_dict() for id, paper in papers.items()]
-
+    print return_dict
     end = time.time()
     print end - start, len(return_list)
 
@@ -35,4 +37,4 @@ def get_papers():
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000)) # use port variable or 5000
-    app.run(debug=False, port=port)
+    app.run(debug=True, port=port)

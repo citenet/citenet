@@ -23,26 +23,26 @@ class Crawler(object):
                            to be confused with 'generations'.
 
         '''
-
-        start_paper = (search(initial_id))[0]
+        print 'a'
+        start_paper = (search('pubmed', initial_id))[0]
         self.tree.add_new_paper(start_paper)
         start_paper.depth = 0
-        self.all[initial_id] = start_paper
         references = get_references_for_paper(start_paper)
-        start_paper.references = references
+        print references
         for reference in references:
+            print 'ttt'
             self.tree.register_citation(citing_paper=start_paper,
                                         cited_paper=reference)
             reference.depth = start_paper.depth + 1
 
         self.tree.remove_from_unwalked(start_paper)
-        self.crawl_linear(initial_id, max_iters)
+        self.crawl_linear(max_iters)
         self.post_filter()
+        print 'b'
+        return self.tree.papers
 
-        return self.all
-
-    def crawl_linear(self, start_paper, max_iters):
-
+    def crawl_linear(self, max_iters):
+        print 'aaaaa'
         while self.tree.unwalked:
 
             for paper in self.pick_next_targets():
@@ -52,12 +52,11 @@ class Crawler(object):
                 self.iteration_counter += 1
                 print self.iteration_counter
 
-                for reference in self.get_references_for_paper(paper):
+                for reference in get_references_for_paper(paper):
                     reference.depth = paper.depth + 1
-                    self.tree.register_citation(citing_paper=start_paper,
+                    self.tree.register_citation(citing_paper=paper,
                                                 cited_paper=reference)
-                    paper.references.append(reference)
-                self.tree.unwalked.remove_from_unwalked(paper)
+                self.tree.remove_from_unwalked(paper)
 
     def crawl_linear_old(self, initial_id, max_iters):
         '''Non-recursive crawler. Takes the papers with the highest

@@ -18,7 +18,7 @@ def get_references_for_paper(paper):
 
     '''
 
-    return search(self.api, self.api_id, True)
+    return search(paper.api, paper.api_id, True)
 
 
 
