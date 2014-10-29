@@ -126,6 +126,8 @@ class Crawler(object):
 
         all_papers = self.tree.papers.values()
 
+        all_papers = [paper for paper in all_papers if not paper.depth <= 1]
+
         if len(all_papers) > 300:
 
             all_papers.sort(key=lambda paper: (paper.local_citation_count,
@@ -136,7 +138,7 @@ class Crawler(object):
 
         elif len(all_papers) > 100:
 
-            less_connected_papers = [paper for paper in all_papers if not paper.references and paper.local_citation_count==1 and not paper.depth <= 1]
+            less_connected_papers = [paper for paper in all_papers if not paper.references and paper.local_citation_count==1]
 
             less_connected_papers.sort(key=lambda paper: (paper.global_citation_count))
 
