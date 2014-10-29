@@ -174,6 +174,17 @@ $( document ).ready(function() {
     // scale foo
     var timeScale = d3.time.scale().domain([maxYear, minYear]).range([maxRadius, height - maxRadius]);
 
+    // add year legend
+    var y;
+    var years = scaleYearLabels(minYear, maxYear);
+    for(var i = 0; i < years.length; i++) {
+      svg.append("text")
+        .text(years[i])
+        .attr("class", "year")
+        .attr("y", timeScale(years[i]) + 20)
+        .attr("z", "-1");
+    }
+
     // handle positioning of circles on svg
     force.on("tick", function() {
       node.attr("cx", function(d) { return d.x; })
@@ -185,5 +196,17 @@ $( document ).ready(function() {
           .attr("y2", function(d) { return d.target.y; });
     });
 
+  }
+
+  function scaleYearLabels(minYear, maxYear) {
+    var years = []
+    years.push(minYear);
+    var d = 5;
+    var year;
+    for (year = (parseInt(minYear / d) + 1) * d; year <= maxYear; year += d) {
+      years.push(year);
+    }
+    years.push(maxYear);
+    return years
   }
 });
