@@ -80,6 +80,12 @@ body {
 
 /* Add space between logo and about section */
 #about {
-  margin-top: 20px;
+  margin-top: 50px;
 }
 
+.year {
+  fill: #ddd;
+  font-size: 50px;
+  position: relative;
+  top: -20px;
+}
