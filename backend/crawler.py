@@ -121,24 +121,25 @@ class Crawler(object):
 
         '''
 
-        if self.tree.papers:
+        if not self.tree.papers:
+            return
 
-            all_papers = self.tree.papers.values()
+        all_papers = self.tree.papers.values()
 
-            if len(all_papers) > 300:
+        if len(all_papers) > 300:
 
-                all_papers.sort(key=lambda paper: (paper.local_citation_count,
-                                paper.global_citation_count), reverse=True)
+            all_papers.sort(key=lambda paper: (paper.local_citation_count,
+                            paper.global_citation_count), reverse=True)
 
-                for paper in all_papers[300:]:
-                    self.tree.papers.pop(paper.key_tuple)
+            for paper in all_papers[300:]:
+                self.tree.papers.pop(paper.key_tuple)
 
-            elif len(all_papers) > 100:
+        elif len(all_papers) > 100:
 
-                less_connected_papers = [paper for paper in all_papers if not paper.references and paper.local_citation_count==1 and not paper.depth <= 1]
+            less_connected_papers = [paper for paper in all_papers if not paper.references and paper.local_citation_count==1 and not paper.depth <= 1]
 
-                less_connected_papers.sort(key=lambda paper: (paper.global_citation_count))
+            less_connected_papers.sort(key=lambda paper: (paper.global_citation_count))
 
-                for paper in less_connected_papers[int(len(less_connected_papers)*cutoff):]:
-                                                   self.tree.papers.pop(paper.key_tuple)
+            for paper in less_connected_papers[int(len(less_connected_papers)*cutoff):]:
+                self.tree.papers.pop(paper.key_tuple)
 
