@@ -15,6 +15,7 @@ class Tree(object):
             self.papers = {}
 
     def paper_is_present(self, paper):
+        '''Bool: True if paper is in the tree.'''
 
         return paper.key_tuple in self.papers
 
@@ -25,7 +26,8 @@ class Tree(object):
     def add_new_paper(self, paper):
 
         self.papers[paper.key_tuple] = paper
-        self.unwalked.append(paper)
+        if paper.has_references:
+            self.unwalked.append(paper)
 
     def register_citation(self, citing_paper=None, cited_paper=None):
 
@@ -40,8 +42,16 @@ class Tree(object):
 
     def remove_from_unwalked(self, paper):
 
-        self.unwalked.remove(paper)
+        if paper in self.unwalked:
+
+            self.unwalked.remove(paper)
 
     def as_dict(self):
+
+        return {key_tuple[1]: paper.as_dict() for key_tuple, paper in self.papers.items()}
+
+    def as_list(self):
+
+        return [paper.as_dict() for paper in self.papers.values()]
 
 

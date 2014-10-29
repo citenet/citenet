@@ -23,14 +23,13 @@ class Crawler(object):
                            to be confused with 'generations'.
 
         '''
-        print 'a'
+
         start_paper = (search('pubmed', initial_id))[0]
         self.tree.add_new_paper(start_paper)
         start_paper.depth = 0
         references = get_references_for_paper(start_paper)
-        print references
+
         for reference in references:
-            print 'ttt'
             self.tree.register_citation(citing_paper=start_paper,
                                         cited_paper=reference)
             reference.depth = start_paper.depth + 1
@@ -38,11 +37,12 @@ class Crawler(object):
         self.tree.remove_from_unwalked(start_paper)
         self.crawl_linear(max_iters)
         self.post_filter()
-        print 'b'
-        return self.tree.papers
+
+        return self.tree
 
     def crawl_linear(self, max_iters):
-        print 'aaaaa'
+        '''Linear crawler'''
+
         while self.tree.unwalked:
 
             for paper in self.pick_next_targets():
@@ -50,54 +50,12 @@ class Crawler(object):
                 if self.iteration_counter > max_iters:
                     return
                 self.iteration_counter += 1
-                print self.iteration_counter
 
                 for reference in get_references_for_paper(paper):
                     reference.depth = paper.depth + 1
                     self.tree.register_citation(citing_paper=paper,
                                                 cited_paper=reference)
                 self.tree.remove_from_unwalked(paper)
-
-    def crawl_linear_old(self, initial_id, max_iters):
-        '''Non-recursive crawler. Takes the papers with the highest
-           citation scores in the local network and finds the references
-           for them. The order of crawling is different than in the
-           recursive version. More (filtered) breadth first.
-                args:
-                initial_id: pubmed id of the paper where the crawling
-                           starts.
-                max_iters: maximum number of iteration, these bascically
-                           correspond to the number of API calls. not
-                           to be confused with 'generations'.
-
-        '''
-
-        # Setting up the first paper in the model as a starting point.
-        start_paper = self.all[initial_id]
-        references_of_first_paper = self.get_references(initial_id)
-        for paper in references_of_first_paper:
-            start_paper.references.append(paper.api_id)
-            paper.depth = 1
-            self.append_child(paper)
-
-        # Walk
-
-        while True:
-
-            if not self.unwalked:
-                return
-
-            for paper in self.pick_next_targets():
-
-                if self.iteration_counter > max_iters:
-                    return
-                self.iteration_counter += 1
-                print self.iteration_counter
-
-                for reference in self.get_references(paper.api_id):
-                    reference.depth = paper.depth + 1
-                    self.append_child(reference)
-                    paper.references.append(reference.api_id)
 
     def crawl_rec(self, initial_id, max_iters):
         '''Recursive crawling.
@@ -123,27 +81,6 @@ class Crawler(object):
                 self.iteration_counter += 1
                 target.walked = True
                 self.crawl_rec(target.api_id, max_iters)
-
-    def get_references(self, api_id):
-        '''Get all references for an id, for now the pubmed id.
-        '''
-        pass
-        #return search(api_id, True)
-
-    def append_child(self, child):
-        '''Updates the papers in the unwalked list and all dict. Also
-           updates the local_citation_count.
-               args: child: new paper object.
-
-        '''
-
-        if not child.api_id in self.all:
-            if child.has_references:
-                self.unwalked.append(child)
-            child.crawled_in_iteration = self.iteration_counter
-            self.all[child.api_id] = child
-        else:
-            self.all[child.api_id].local_citation_count += 1
 
     def pick_next_targets(self):
         '''Defines how the papers to be crawled next are selected from
@@ -195,7 +132,6 @@ class Crawler(object):
 
                 for paper in all_papers[300:]:
                     self.tree.papers.pop(paper.key_tuple)
-                print len(self.all.values())
 
             elif len(all_papers) > 100:
 
@@ -205,7 +141,4 @@ class Crawler(object):
 
                 for paper in less_connected_papers[int(len(less_connected_papers)*cutoff):]:
                                                    self.tree.papers.pop(paper.key_tuple)
-
-
-
 

@@ -18,7 +18,7 @@ def get_references_for_paper(paper):
 
     '''
 
-    return search(paper.api, paper.api_id, True)
+    return search(paper.api, paper.api_id, True)[1:]
 
 
 
@@ -27,7 +27,5 @@ if __name__ == '__main__':
     print len(papers)
     for paper in papers:
         print paper.title
-
-
 
 

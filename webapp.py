@@ -25,15 +25,12 @@ def get_papers():
         paper_id = "MED,23589462"
 
     crawler = Crawler()
-    papers = crawler.crawl(paper_id, 2)
+    tree = crawler.crawl(paper_id, 3)
 
-    return_dict = {id: paper.as_dict() for id, paper in papers.items()}
-    return_list = [paper.as_dict() for id, paper in papers.items()]
-    print return_dict
     end = time.time()
-    print end - start, len(return_list)
+    print end - start
 
-    return jsonify(**{"list": return_list, "object": return_dict})
+    return jsonify(**{"list": tree.as_list(), "object": tree.as_dict()})
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000)) # use port variable or 5000
