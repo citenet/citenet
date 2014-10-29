@@ -167,30 +167,33 @@ class Crawler(object):
 
         '''
 
-        if self.all:
+        if not self.all:
+            return
 
-            all_papers = self.all.values()
+        all_papers = self.all.values()
 
-            if len(all_papers) > 300:
+        all_papers = [paper for paper in all_papers if not paper.depth <= 1]
 
-                print 'more than 300'
+        if len(all_papers) > 300:
 
-                all_papers.sort(key=lambda paper: (paper.local_citation_count, paper.global_citation_count), reverse=True)
+            print 'more than 300'
 
-                for paper in all_papers[300:]:
-                    self.all.pop(paper.api_id)
-                print len(self.all.values())
+            all_papers.sort(key=lambda paper: (paper.local_citation_count, paper.global_citation_count), reverse=True)
 
-            elif len(all_papers) > 100:
+            for paper in all_papers[300:]:
+                self.all.pop(paper.api_id)
+            print len(self.all.values())
 
-                print 'more than 100'
+        elif len(all_papers) > 100:
 
-                less_connected_papers = [paper for paper in all_papers if not paper.references and paper.local_citation_count==1 and not paper.depth <= 1]
+            print 'more than 100'
 
-                less_connected_papers.sort(key=lambda paper: (paper.global_citation_count))
+            less_connected_papers = [paper for paper in all_papers if not paper.references and paper.local_citation_count==1]
 
-                for paper in less_connected_papers[int(len(less_connected_papers)*cutoff):]:
-                    self.all.pop(paper.api_id)
+            less_connected_papers.sort(key=lambda paper: (paper.global_citation_count))
+
+            for paper in less_connected_papers[int(len(less_connected_papers)*cutoff):]:
+                self.all.pop(paper.api_id)
 
 
 

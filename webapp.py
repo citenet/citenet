@@ -24,7 +24,7 @@ def get_papers():
     else:
         paper_id = "MED,23589462"
     crawler = Crawler()
-    papers = crawler.crawl(paper_id, 10)
+    papers = crawler.crawl(paper_id, 20)
     return_dict = {id: paper.as_dict() for id, paper in papers.items()}
     return_list = [paper.as_dict() for id, paper in papers.items()]
 
